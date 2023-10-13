@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre',40);
             $table->string('color',40);
-            $table->boolean('estado')->default(false);
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Models\Category;
 
 /*
@@ -24,14 +25,10 @@ Route::controller(CategoryController::class)->group(function () {
     Route::post('addcategory', 'addCategory');
     Route::get('categories', 'getCategories');
     Route::get('category/{id}', 'getCategoryById');
-Route::delete('category/{id}', 'deleteCategoryById');
-
-
+    Route::delete('category/{id}', 'deleteCategoryById');
 });
 
-// Route::get('tasks', 'getAllTasksByUser');
-// Route::get('tasks/{id}', 'getTaskById');
-// Route::put('edittask/{id}', 'editTaskById');
-// Route::put('taskdone/{id}', 'TaskDoneById');
-// Route::delete('tasks/{id}', 'deleteTaskById');
-// Route::get('taskstatus/{id}', 'getStatusTaskById');
+Route::controller(ProductController::class)->group(function () {
+    Route::post('addproduct', 'addProduct');
+    Route::get('products', 'getProducts');
+});

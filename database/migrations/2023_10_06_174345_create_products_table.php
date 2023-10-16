@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreign('cat_id')->references('id')->on('categories');
             $table->string('nombre',50);
             $table->string('imagen');
-            $table->string('codigo');
             $table->boolean('estado')->default(true);
             $table->float('precio_adquirido');
             $table->float('precio_de_venta');

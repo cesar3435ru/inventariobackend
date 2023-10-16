@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -15,7 +16,6 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:100',
             'cat_id' => 'required',
-            'codigo' => 'required',
             'stock' => 'required | numeric',
             'precio_adquirido' => 'required',
             'precio_de_venta' => 'required',
@@ -35,7 +35,6 @@ class ProductController extends Controller
             'cat_id' => $request->cat_id,
             'imagen' => $rutaArchivoImg,
             'stock' => $request->stock,
-            'codigo' => $request->codigo,
             'precio_adquirido' => $request->precio_adquirido,
             'precio_de_venta' => $request->precio_de_venta,
             'caducidad' => $request->caducidad,
@@ -45,8 +44,19 @@ class ProductController extends Controller
         return response()->json(['producto' => $producto], 201);
     }
 
-    public function getProducts()
-    {
-        return response()->json(product::all(), 200);
+    // public function getProducts()
+    // {
+    //     return response()->json(product::all(), 200);
+    // }
+
+    public function getProducts() {
+        $products = Product::all();
+    
+        foreach ($products as $product) {
+            $product->imagen = asset(Storage::url($product->imagen));
+        }
+    
+        return response()->json($products, 200);
     }
+    
 }

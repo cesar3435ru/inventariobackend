@@ -19,8 +19,6 @@ class ProductController extends Controller
             'stock' => 'required | numeric',
             'precio_adquirido' => 'required',
             'precio_de_venta' => 'required',
-            'caducidad' => 'required',
-            // 'precio' => 'required|numeric|regex:/^\d{1,4}(\.\d{1,2})?$/|max:9999.99',
             'imagen' => 'required|image|max:2048',
 
         ]);
@@ -28,6 +26,8 @@ class ProductController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        $caducidad = $request->has('caducidad') ? $request->caducidad : null;
 
         $rutaArchivoImg = $request->file('imagen')->store('public/imgproductos');
         $producto = Product::create([
@@ -37,8 +37,7 @@ class ProductController extends Controller
             'stock' => $request->stock,
             'precio_adquirido' => $request->precio_adquirido,
             'precio_de_venta' => $request->precio_de_venta,
-            'caducidad' => $request->caducidad,
-
+            'caducidad' => $caducidad,
         ]);
 
         return response()->json(['producto' => $producto], 201);
@@ -49,14 +48,14 @@ class ProductController extends Controller
     //     return response()->json(product::all(), 200);
     // }
 
-    public function getProducts() {
+    public function getProducts()
+    {
         $products = Product::all();
-    
+
         foreach ($products as $product) {
             $product->imagen = asset(Storage::url($product->imagen));
         }
-    
+
         return response()->json($products, 200);
     }
-    
 }

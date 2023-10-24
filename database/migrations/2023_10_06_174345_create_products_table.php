@@ -21,7 +21,7 @@ return new class extends Migration
             $table->float('precio_adquirido');
             $table->float('precio_de_venta');
             $table->integer('stock');
-            $table->date('caducidad');
+            $table->date('caducidad')->nullable();
             $table->timestamps();
         });
     }

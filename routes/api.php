@@ -30,5 +30,12 @@ Route::controller(CategoryController::class)->group(function () {
 
 Route::controller(ProductController::class)->group(function () {
     Route::post('addproduct', 'addProduct');
-    Route::get('products', 'getProducts');
+    Route::get('products', 'getProducts'); //Trae los productos sin importar su estado
+    Route::get('activeproducts', 'getProducts'); //Trae los productos donde su estado es activo
+    Route::get('product/{id}', 'getProductById');
+    Route::delete('product/{id}', 'deleteProduct'); //Elimina el registro por completo de la DB
+    Route::put('archproduct/{id}', 'archiveProduct'); //Archiva el producto de la DB
+    Route::put('actproduct/{id}', 'activeProduct'); //Restaura el producto de la DB
+    Route::put('product/{id}', 'editProductById');
+    Route::put('pro/{id}', 'updateById');
 });

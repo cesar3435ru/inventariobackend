@@ -120,24 +120,29 @@ class ProductController extends Controller
         return response()->json(['message' => 'Product archived successfully...'], 200);
     }
 
+
+
     public function editProductById($id, Request $request)
     {
-
         $product = Product::find($id);
 
         if (!$product) {
             return response()->json(['error' => 'Product not found in DB'], 404);
         }
-
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'nombre' => 'required|string|max:100',
             'cat_id' => 'required',
-            'stock' => 'required | numeric',
+            'stock' => 'required|numeric',
             'precio_adquirido' => 'required',
             'precio_de_venta' => 'required',
-            'imagen' => 'required|image|max:2048',
+        ];
 
-        ]);
+        // Verificar si se proporcionó una imagen en la solicitud
+        if ($request->hasFile('imagen')) {
+            $rules['imagen'] = 'image|max:2048';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -145,60 +150,21 @@ class ProductController extends Controller
 
         $caducidad = $request->has('caducidad') ? $request->caducidad : null;
 
-        $rutaArchivoImg = $request->file('imagen')->store('public/imgproductos');
+        // Verificar si se proporcionó una imagen en la solicitud antes de almacenarla
+        if ($request->hasFile('imagen')) {
+            $rutaArchivoImg = $request->file('imagen')->store('public/imgproductos');
+            $product->imagen = $rutaArchivoImg;
+        }
+
         $product->update([
             'nombre' => $request->nombre,
             'cat_id' => $request->cat_id,
-            'imagen' => $rutaArchivoImg,
             'stock' => $request->stock,
             'precio_adquirido' => $request->precio_adquirido,
             'precio_de_venta' => $request->precio_de_venta,
-            'caducidad' => $caducidad,
-        ]);
-        return response()->json(['producto' => $product], 201); //Solicitud ok y devuelve el cambio hecho
-        // return response()->json(['message' => 'Product updated successfully', 'producto' => $product], 200); //Solicitud ok y solo devuelve mensaje
-    }
-
-    public function updateById(Request $request, $id)
-    {
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json(['error' => 'Product not found'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:100',
-            'cat_id' => 'required',
-            'stock' => 'required | numeric',
-            'precio_adquirido' => 'required',
-            'precio_de_venta' => 'required',
-            'imagen' => 'required|image|max:2048',
+            'caducidad' => $caducidad
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-        // Eliminar el archivo anterior si existe
-        if ($product->rutaimg && Storage::exists($product->rutaimg)) {
-            Storage::delete($product->rutaimg);
-        }
-
-        $caducidad = $request->has('caducidad') ? $request->caducidad : null;
-
-        $rutaArchivoImg = $request->file('imagen')->store('public/imgproductos');
-
-        $product->save([
-            'nombre' => $request->nombre,
-            'cat_id' => $request->cat_id,
-            'imagen' => $rutaArchivoImg,
-            'stock' => $request->stock,
-            'precio_adquirido' => $request->precio_adquirido,
-            'precio_de_venta' => $request->precio_de_venta,
-            'caducidad' => $caducidad,
-
-        ]);
-
-        return response()->json(['product' => $product], 200);
+        return response()->json(['producto' => $product], 201);
     }
 }

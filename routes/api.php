@@ -37,5 +37,4 @@ Route::controller(ProductController::class)->group(function () {
     Route::put('archproduct/{id}', 'archiveProduct'); //Archiva el producto de la DB
     Route::put('actproduct/{id}', 'activeProduct'); //Restaura el producto de la DB
     Route::put('product/{id}', 'editProductById');
-    Route::put('pro/{id}', 'updateById');
 });

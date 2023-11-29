@@ -167,4 +167,54 @@ class ProductController extends Controller
 
         return response()->json(['producto' => $product], 201);
     }
+
+
+
+    public function updateProd(Request $request, $id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'string|max:50',
+            'precio_adquirido' => 'numeric',
+            'precio_de_venta' => 'numeric',
+            'stock' => 'numeric|nullable',
+            'caducidad' => 'date|nullable',
+            'cat_id' => 'numeric|nullable',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        if ($request->hasFile('imagen')) {
+            // Si se envía una nueva imagen, se elimina la imagen anterior y se almacena la nueva.
+            if ($product->imagen) {
+                Storage::delete($product->imagen);
+            }
+            $rutaArchivoImg = $request->file('imagen')->store('public/imgproductos');
+            $product->imagen = $rutaArchivoImg;
+        }
+        // Ahora, se actualizan los otros campos independientemente de si se envía una imagen o no.
+        if ($request->has('nombre')) {
+            $product->nombre = $request->input('nombre');
+        }
+        if ($request->has('cat_id')) {
+            $product->cat_id = $request->input('cat_id');
+        }
+        if ($request->has('precio_adquirido')) {
+            $product->precio_adquirido = $request->input('precio_adquirido');
+        }
+        if ($request->has('precio_de_venta')) {
+            $product->precio_de_venta = $request->input('precio_de_venta');
+        }
+        if ($request->has('stock')) {
+            $product->stock = $request->input('stock');
+        }
+        if ($request->has('caducidad')) {
+            $product->caducidad = $request->input('caducidad');
+        }
+        $product->save();
+        return response()->json(['message' => 'Producto actualizado con éxito'], 200);
+    }
 }

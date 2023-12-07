@@ -45,4 +45,5 @@ Route::controller(ProductController::class)->group(function () {
 Route::controller(SaleController::class)->group(function () {
     Route::post('nventa', 'newSale');
     Route::get('ventas', 'getVentas');
+    Route::get('masvendidos', 'productosMasVendidos');
 });

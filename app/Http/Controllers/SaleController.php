@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -93,5 +94,47 @@ class SaleController extends Controller
         ]);
 
         return response()->json(['producto' => $venta], 201);
+    }
+
+    // public function productosMasVendidos()
+    // {
+    //     $productos = Sale::select('prod_id', DB::raw('SUM(cantidad) as total_vendido'))
+    //         ->groupBy('prod_id')
+    //         ->orderByDesc('total_vendido')
+    //         ->limit(5) // Cambia este límite según tus necesidades
+    //         ->get();
+
+    //     // Obtener los detalles de los productos más vendidos
+    //     $productosMasVendidos = [];
+    //     foreach ($productos as $producto) {
+    //         $prodDetalle = Product::find($producto->prod_id);
+    //         if ($prodDetalle) {
+    //             $producto->detalle = $prodDetalle;
+    //             $productosMasVendidos[] = $producto;
+    //         }
+    //     }
+
+    //     return response()->json(['productos_mas_vendidos' => $productosMasVendidos], 200);
+    // }
+
+    public function productosMasVendidos()
+    {
+        $productos = Sale::select('prod_id', DB::raw('CAST(SUM(cantidad) AS UNSIGNED) as total_vendido'))
+            ->groupBy('prod_id')
+            ->orderByDesc('total_vendido')
+            ->limit(5)
+            ->get();
+
+        // Obtener los detalles de los productos más vendidos
+        $productosMasVendidos = [];
+        foreach ($productos as $producto) {
+            $prodDetalle = Product::find($producto->prod_id);
+            if ($prodDetalle) {
+                $producto->detalle = $prodDetalle;
+                $productosMasVendidos[] = $producto;
+            }
+        }
+
+        return response()->json(['productos_mas_vendidos' => $productosMasVendidos], 200);
     }
 }
